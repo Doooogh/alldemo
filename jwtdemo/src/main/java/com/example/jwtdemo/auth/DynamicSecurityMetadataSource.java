@@ -39,6 +39,7 @@ public class DynamicSecurityMetadataSource implements FilterInvocationSecurityMe
         String url = ((FilterInvocation) o).getRequestUrl();
         String path = URLUtil.getPath(url);
         PathMatcher pathMatcher = new AntPathMatcher();
+        //遍历我们初始化的权限数据，找到对应的url对应的权限  configAttributeMap为初始化的权限数据
         Iterator<String> iterator = configAttributeMap.keySet().iterator();
         //获取访问该路径所需资源
         while (iterator.hasNext()) {
