@@ -25,22 +25,22 @@ public class CustomizedUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        JwtUser jwtUser=null;
 
         //TODO 根据用户名从数据库查询该用户
-        SysUser sysUser =new SysUser();
-        sysUser.setId("test");
-        sysUser.setUsername("test");
-        sysUser.setPassword("$2a$10$xcuttGC1V97i3BYCxUFBUOE8.kbr2hEPCW9imUP7UtwGJR/jhCQaC");
+        SysUser sysUser= sysUserDao.findByUsername(username);
+        if(null==sysUser){
+            return jwtUser;
+        }
 
         Set<String> roleNames=new HashSet<>();
-
        /* SysUser sysUser1 = sysUserDao.findByUsername(username);
 
         if(null!=sysUser1){
             //TODO 将该用户的权限查询出来  赋值给roleNames
         }*/
-    roleNames.add("ROLE_USER");
-        JwtUser jwtUser=new JwtUser(sysUser,roleNames);
+        roleNames.add("USER");
+        jwtUser=new JwtUser(sysUser,roleNames);
         return jwtUser;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.jwtdemo.service.impl;
 
 import com.example.jwtdemo.auth.CustomizedUserDetailsService;
+import com.example.jwtdemo.common.ResultEnum;
 import com.example.jwtdemo.dao.SysUserDao;
 import com.example.jwtdemo.entity.SysUser;
 import com.example.jwtdemo.service.SysUserService;
@@ -44,10 +45,11 @@ public class SysUserServiceImpl  implements SysUserService {
     public String login(String username, String password) {
         String token=null;
         UserDetails userDetails = customizedUserDetailsService.loadUserByUsername(username);
+
         if(null!=userDetails){
             //对比密码
             if(!passwordEncoder.matches(password,userDetails.getPassword())){
-                throw new BadCredentialsException("密码不正确");
+                throw new BadCredentialsException(ResultEnum.USER_LOGIN_FAILED.getMessage());
             }
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);

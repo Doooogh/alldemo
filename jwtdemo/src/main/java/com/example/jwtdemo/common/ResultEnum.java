@@ -14,14 +14,19 @@ import lombok.Getter;
 public enum  ResultEnum {
     SUCCESS(200,"success"),
     ERROR(500,"system error!"),
-    ERROR1(501,"system error11!"),
-    USER_NEED_AUTHORITIES(201,"用户未登录"),
-    USER_LOGIN_FAILED(202,"用户账号或密码错误"),
-    USER_LOGIN_SUCCESS(203,"用户登录成功"),
-    USER_NO_ACCESS(204,"用户无权访问"),
-    USER_LOGOUT_SUCCESS(205,"用户登出成功"),
-    TOKEN_IS_BLACKLIST(206,"此token为黑名单"),
-    LOGIN_IS_OVERDUE(207,"登录已失效"),
+
+    //登录 权限 登出
+    USER_IS_NOT_EXIST(10001,"用户不存在"),
+    USER_LOGIN_FAILED(10002,"用户账号或密码错误"),
+    USER_NEED_AUTHORITIES(10003,"用户未登录"),
+    USER_IS_LOCKED(10004,"用户已被锁定"),
+    USER_IS_DISABLED(10005,"用户已被禁用"),
+    NOT_LOGIN_OR_TOKEN_OVERDUE(10006,"用户未登录或token已过期"),
+
+    USER_LOGIN_SUCCESS(10007,"用户登录成功"),
+    USER_NO_ACCESS(10008,"用户无权访问"),
+    USER_LOGOUT_SUCCESS(10009,"用户登出成功"),
+    TOKEN_IS_BLACKLIST(100010,"token获取失败"),
     ;
 
     private Integer code;

@@ -3,9 +3,11 @@ package com.example.jwtdemo.utils;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Date;
@@ -24,15 +26,15 @@ public class JwtUtils {
     private static final String CLAIM_KEY_USERNAME = "sub";
     private static final String CLAIM_KEY_CREATED = "created";
 
-    private String secret="mall-admin-secret";
-    private Long expiration=604800L;
-    private String tokenHead="Authorization";
-    /*@Value("${jwt.secret}")
+   /* private String secret="mall-admin-secret";
+    private Long expiration=1L*60;
+    private String tokenHead="Authorization";*/
+    @Value("${jwt.secret}")
     private String secret;
     @Value("${jwt.expiration}")
     private Long expiration;
     @Value("${jwt.tokenHead}")
-    private String tokenHead;*/
+    private String tokenHead;
 
 
 
@@ -58,8 +60,9 @@ public class JwtUtils {
                     .setSigningKey(secret)
                     .parseClaimsJws(token)
                     .getBody();
-        } catch (Exception e) {
-            log.info("JWT格式验证失败:{}", token);
+        } catch (ExpiredJwtException e) {
+            claims=e.getClaims();
+            log.error("JWT格式验证失败:{已经过期}", token);
         }
         return claims;
     }
@@ -162,8 +165,11 @@ public class JwtUtils {
 
     public static void main(String[] args) {
         JwtUtils jwtUtils = new JwtUtils();
-        String token = jwtUtils.getToken("admin");
-        System.out.println(token);
+    /*    String token = jwtUtils.getToken("test");
+        System.out.println(token);*/
+        String token="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0IiwiY3JlYXRlZCI6MTU5NjAxMzY0MDUzMSwiZXhwIjoxNTk2MDEzNzAwfQ.FG5hT3lOyOLl9y1tJVdyO3MVBAAHOrM_3CNZJjUotXQHK3NuB03Bwl6Dlyu6kJ7CD9j5wNbVFA4Fi8jRZYhoWg";
+//        eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0IiwiY3JlYXRlZCI6MTU5NjAxMzI0MjMxNSwiZXhwIjoxNTk2MDEzMjUyfQ.58rA1vVtbW7_xPt16Cxj8eAGqzibvyTsuGqeBEmtfD-EZ-UIF2uZQSJJqN4DEzRFk5EdzG_SBHxtWLc3s9MpOg
+
         System.out.println("____________token中获取JWT中的负载_______________");
         Claims claimsFromToken = jwtUtils.getClaimsFromToken(token);
         System.out.println(claimsFromToken);

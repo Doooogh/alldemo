@@ -7,10 +7,10 @@ package com.example.jwtdemo.auth.config;
  * @Version 1.0
  **/
 
-import com.example.jwtdemo.auth.AjaxAccessDeniedHandler;
-import com.example.jwtdemo.auth.AjaxAuthenticationEntryPoint;
-import com.example.jwtdemo.auth.JwtAuthenticationTokenFilter;
+import com.example.jwtdemo.auth.*;
 import com.example.jwtdemo.utils.JwtUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +23,7 @@ import org.springframework.security.config.annotation.web.configurers.Expression
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
@@ -31,7 +32,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
 
-
+    @Autowired(required = false)
+    private DynamicSecurityService dynamicSecurityService;
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = httpSecurity
@@ -64,15 +66,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         //有动态权限配置时添加动态权限校验过滤器
-       /* if(dynamicSecurityService!=null){
+        if(dynamicSecurityService!=null){
             registry.and().addFilterBefore(dynamicSecurityFilter(), FilterSecurityInterceptor.class);
-        }*/
+        }
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService())
+                auth
+//                .authenticationProvider(loginValidateAuthenticationProvider())
+                .userDetailsService(userDetailsService())
                 .passwordEncoder(passwordEncoder());
+
+    }
+
+    // 自定义认证，
+    @Bean
+    public LoginValidateAuthenticationProvider loginValidateAuthenticationProvider() {
+        return new LoginValidateAuthenticationProvider();
     }
 
     // 加密密码的，
@@ -112,7 +123,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new JwtUtils();
     }
 
-    /*@ConditionalOnBean(name = "dynamicSecurityService")
+    @ConditionalOnBean(name = "dynamicSecurityService")
     @Bean
     public DynamicAccessDecisionManager dynamicAccessDecisionManager() {
         return new DynamicAccessDecisionManager();
@@ -129,6 +140,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public DynamicSecurityMetadataSource dynamicSecurityMetadataSource() {
         return new DynamicSecurityMetadataSource();
-    }*/
+    }
 
 }

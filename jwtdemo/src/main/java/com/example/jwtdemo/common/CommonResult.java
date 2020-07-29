@@ -59,11 +59,9 @@ public class CommonResult <T>{
         String successMsg="successMsg";
         CommonResult success = success(successMsg);
         CommonResult error = error();
-        CommonResult commonResult = errorOfRestltEnum(ResultEnum.ERROR1);
         CommonResult errorOfMessage = errorOfMessage("errorOfMessage");
         System.out.println(success);
         System.out.println(error);
-        System.out.println(commonResult);
         System.out.println(errorOfMessage);
     }
 }

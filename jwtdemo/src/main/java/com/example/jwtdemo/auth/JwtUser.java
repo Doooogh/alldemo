@@ -27,13 +27,14 @@ public class JwtUser implements UserDetails {
     public JwtUser(SysUser sysUser, Set<String> roleNames) {
         this.sysUser = sysUser;
         this.roleNames = roleNames;
+
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> simpleGrantedAuthorities=new ArrayList<>();
         for (String roleName : roleNames) {
-            simpleGrantedAuthorities.add(new SimpleGrantedAuthority(roleName));
+            simpleGrantedAuthorities.add(new SimpleGrantedAuthority("ROLE_"+roleName));
         }
         return simpleGrantedAuthorities;
     }
@@ -48,23 +49,32 @@ public class JwtUser implements UserDetails {
         return sysUser.getUsername();
     }
 
+    //是否已过期
     @Override
     public boolean isAccountNonExpired() {
         return false;
     }
-
+    //是否已锁定
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        if(sysUser.getLocked()==1){
+            return true;
+        }
+        return false;
     }
 
+    //凭证是否过期
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return false;
     }
 
+    //是否可用
     @Override
     public boolean isEnabled() {
-        return true;
+        if(sysUser.getDisabled()==1){
+            return true;
+        }
+        return false;
     }
 }
