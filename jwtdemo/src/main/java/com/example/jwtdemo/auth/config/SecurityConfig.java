@@ -54,6 +54,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf()
                 .disable()
+                // 登录行为由自己实现，参考 AuthController#login
+                .formLogin().disable()
+                .httpBasic().disable()
+                // 登出行为由自己实现，参考 AuthController#logout
+                .logout().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)     // 不需要session
                 // 自定义权限拒绝处理类

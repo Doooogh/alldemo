@@ -18,5 +18,5 @@ public class SysUser {
     private String password;
     private Integer locked;
     private Integer disabled;
-    private List<Role> roleList;
+    private List<SysRole> sysRoleList;
 }

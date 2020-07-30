@@ -11,10 +11,10 @@ import java.util.Set;
  * @Version 1.0
  **/
 @Data
-public class Role {
+public class SysRole {
 
     private String id;
     private String roleName;
     private String roleEnglishName;
-    private Set<String> permissions;
+    private Set<String> menuList;
 }

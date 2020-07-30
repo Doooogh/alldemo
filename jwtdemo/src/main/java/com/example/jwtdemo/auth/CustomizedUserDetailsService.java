@@ -1,7 +1,10 @@
 package com.example.jwtdemo.auth;
 
+import com.example.jwtdemo.dao.SysPermissionDao;
 import com.example.jwtdemo.dao.SysUserDao;
+import com.example.jwtdemo.entity.SysPermission;
 import com.example.jwtdemo.entity.SysUser;
+import com.example.jwtdemo.service.SysMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,6 +26,12 @@ public class CustomizedUserDetailsService implements UserDetailsService {
     @Autowired
     private SysUserDao sysUserDao;
 
+    @Autowired
+    private SysPermissionDao sysPermissionDao;
+
+    @Autowired
+    private SysMenuService sysMenuService;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         JwtUser jwtUser=null;
@@ -33,14 +42,10 @@ public class CustomizedUserDetailsService implements UserDetailsService {
             return jwtUser;
         }
 
-        Set<String> roleNames=new HashSet<>();
-       /* SysUser sysUser1 = sysUserDao.findByUsername(username);
+        Set<SysPermission> permissionList=new HashSet<>();
+        //TODO 将该用户的权限查询出来  赋值给permissionList
 
-        if(null!=sysUser1){
-            //TODO 将该用户的权限查询出来  赋值给roleNames
-        }*/
-        roleNames.add("USER");
-        jwtUser=new JwtUser(sysUser,roleNames);
+        jwtUser=new JwtUser(sysUser,permissionList);
         return jwtUser;
     }
 }
