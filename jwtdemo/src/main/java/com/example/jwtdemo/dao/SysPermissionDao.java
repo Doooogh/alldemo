@@ -15,5 +15,5 @@ public interface SysPermissionDao {
 
     List<SysPermission> getList();
 
-    List<SysPermission> getListByRoleId(@Param("roleId") String roleId);
+    List<SysPermission> getListByIds(@Param("ids") List<String> ids);
 }

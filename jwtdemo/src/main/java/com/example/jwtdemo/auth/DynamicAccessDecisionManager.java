@@ -1,6 +1,7 @@
 package com.example.jwtdemo.auth;
 
 import cn.hutool.core.collection.CollUtil;
+import com.example.jwtdemo.common.ResultEnum;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
@@ -35,7 +36,7 @@ public class DynamicAccessDecisionManager implements AccessDecisionManager {
                 }
             }
         }
-        throw new AccessDeniedException("抱歉，您没有访问权限");
+        throw new AccessDeniedException(ResultEnum.USER_NO_ACCESS.getMessage());
     }
 
     @Override

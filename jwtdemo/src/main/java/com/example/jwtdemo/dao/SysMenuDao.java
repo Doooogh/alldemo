@@ -11,5 +11,6 @@ import java.util.List;
  * @Version 1.0
  **/
 public interface SysMenuDao {
+    List<SysMenu> getList();
     List<SysMenu> getListByRoleId(String roleId);
 }

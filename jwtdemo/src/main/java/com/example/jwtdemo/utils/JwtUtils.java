@@ -126,11 +126,10 @@ public class JwtUtils {
      *
      * @param oldToken 带tokenHead的token
      */
-    public String refreshHeadToken(String oldToken) {
-        if(StrUtil.isEmpty(oldToken)){
+    public String refreshHeadToken(String token) {
+        if(StrUtil.isEmpty(token)){
             return null;
         }
-        String token = oldToken.substring(tokenHead.length());
         if(StrUtil.isEmpty(token)){
             return null;
         }

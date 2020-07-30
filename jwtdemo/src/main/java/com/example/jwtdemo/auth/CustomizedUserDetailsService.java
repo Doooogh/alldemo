@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @Description
@@ -56,6 +59,7 @@ public class CustomizedUserDetailsService implements UserDetailsService {
         List<SysMenu> menuList=new ArrayList<>();
         List<SysPermission> permissionList=new ArrayList<>();
         List<SysRole> roleList = sysRoleDao.getRoleByUserId(sysUser.getId());
+        List<String> roleIds = roleList.stream().map(SysRole::getId).collect(toList());
         for (SysRole sysRole : roleList) {
             List<SysMenu> menuListTem = sysMenuDao.getListByRoleId(sysRole.getId());
             List<SysPermission> permissionListTem = sysPermissionDao.getListByRoleId(sysRole.getId());

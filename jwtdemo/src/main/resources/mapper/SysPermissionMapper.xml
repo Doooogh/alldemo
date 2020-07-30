@@ -3,26 +3,29 @@
 <mapper namespace="com.example.jwtdemo.dao.SysPermissionDao">
 
     <select id="getList" resultType="com.example.jwtdemo.entity.SysPermission">
-        select * from
-        sys_menu
+        select
+        p.id,
+        p.parent_id,
+        p.name,
+        p.type,
+        p.path,
+        p.permission,
+        p.order_num,
+        p.disable
+        from
+        sys_permission p
     </select>
 
-    <select id="getListByRoleId" resultType="com.example.jwtdemo.entity.SysPermission" parameterType="string">
-        select
-        m.id,
-        m.parent_id,
-        m.name,
-        m.type,
-        m.path,
-        m.permission,
-        m.order_num,
-        m.disable
+
+    <select id="getListByIds" resultType="com.example.jwtdemo.entity.SysPermission">
+        select *
         from
-        sys_role_menu rm
-        left join
-        sys_menu m
-        on rm.role_id=m.id
-        where role_id=#{roleId}
+        sys_permission
+        where
+        id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </select>
 
 </mapper>

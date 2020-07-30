@@ -8,11 +8,14 @@ package com.example.jwtdemo.auth.config;
  **/
 
 import com.example.jwtdemo.auth.*;
+import com.example.jwtdemo.dao.SysPermissionDao;
+import com.example.jwtdemo.entity.SysPermission;
 import com.example.jwtdemo.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -26,14 +29,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
 
-    @Autowired(required = false)
-    private DynamicSecurityService dynamicSecurityService;
+
+
+    @Autowired
+    private SysPermissionDao sysPermissionDao;
+
+
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = httpSecurity
@@ -71,7 +82,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         //有动态权限配置时添加动态权限校验过滤器
-        if(dynamicSecurityService!=null){
+        if(dynamicSecurityService()!=null){
             registry.and().addFilterBefore(dynamicSecurityFilter(), FilterSecurityInterceptor.class);
         }
     }
@@ -128,6 +139,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new JwtUtils();
     }
 
+    @Bean
+    public DynamicSecurityService dynamicSecurityService() {
+        return new DynamicSecurityService() {
+            @Override
+            public Map<String, ConfigAttribute> loadDataSource() {
+                List<SysPermission> list = sysPermissionDao.getList();
+                Map<String, ConfigAttribute> map = new ConcurrentHashMap<>();
+                for (SysPermission sysPermission : list) {
+                    map.put(sysPermission.getPath(),new org.springframework.security.access.SecurityConfig(sysPermission.getPermission()));
+                }
+                return map;
+            }
+        };
+    }
+
     @ConditionalOnBean(name = "dynamicSecurityService")
     @Bean
     public DynamicAccessDecisionManager dynamicAccessDecisionManager() {
@@ -146,5 +172,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public DynamicSecurityMetadataSource dynamicSecurityMetadataSource() {
         return new DynamicSecurityMetadataSource();
     }
+
+
 
 }

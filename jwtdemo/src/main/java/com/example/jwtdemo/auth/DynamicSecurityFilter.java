@@ -25,6 +25,7 @@ public class DynamicSecurityFilter extends AbstractSecurityInterceptor implement
     @Autowired
     private IgnoreUrlsConfig ignoreUrlsConfig;
 
+
     @Autowired
     public void setMyAccessDecisionManager(DynamicAccessDecisionManager dynamicAccessDecisionManager) {
         super.setAccessDecisionManager(dynamicAccessDecisionManager);
