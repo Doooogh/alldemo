@@ -8,9 +8,11 @@ import com.example.jwtdemo.service.SysUserService;
 import com.example.jwtdemo.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,15 +49,17 @@ public class SysUserServiceImpl  implements SysUserService {
         UserDetails userDetails = customizedUserDetailsService.loadUserByUsername(username);
 
         if(null!=userDetails){
-            //对比密码
-            if(!passwordEncoder.matches(password,userDetails.getPassword())){
+            if(userDetails.isAccountNonLocked()){
+                throw new CredentialsExpiredException(ResultEnum.NOT_LOGIN_OR_TOKEN_OVERDUE.getMessage());
+            }else if(userDetails.isEnabled()){
+                throw new BadCredentialsException(ResultEnum.USER_LOGIN_FAILED.getMessage());
+            }else if(!passwordEncoder.matches(password,userDetails.getPassword())){ //对比密码
                 throw new BadCredentialsException(ResultEnum.USER_LOGIN_FAILED.getMessage());
             }
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
             token = jwtUtils.getToken(username);
+            return token;
         }
-        return token;
+        throw new UsernameNotFoundException( ResultEnum.USER_IS_NOT_EXIST.getMessage());
     }
 
     public static void main(String[] args) {

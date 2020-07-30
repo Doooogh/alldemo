@@ -34,9 +34,6 @@ public class LoginController {
     @PostMapping("/login")
     public CommonResult login(String username,String password){
         String token = sysUserService.login(username, password);
-        if(null==token){
-            return CommonResult.errorOfRestltEnum(ResultEnum.USER_LOGIN_FAILED);
-        }
         Map<String, String> tokenMap = new HashMap<>();
         tokenMap.put("token", token);
         tokenMap.put("tokenHead", tokenHead);
