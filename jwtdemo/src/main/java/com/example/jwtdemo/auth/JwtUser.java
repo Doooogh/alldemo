@@ -1,6 +1,8 @@
 package com.example.jwtdemo.auth;
 
+import com.example.jwtdemo.entity.SysMenu;
 import com.example.jwtdemo.entity.SysPermission;
+import com.example.jwtdemo.entity.SysRole;
 import com.example.jwtdemo.entity.SysUser;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,20 +24,21 @@ import java.util.Set;
 public class JwtUser implements UserDetails {
 
     private SysUser sysUser;
+    private Set<SysMenu> menuList;
     private Set<SysPermission> permissionList;
 
 
-    public JwtUser(SysUser sysUser, Set<SysPermission> roleNames) {
+    public JwtUser(SysUser sysUser, Set<SysMenu> menuList,Set<SysPermission> permissionList) {
         this.sysUser = sysUser;
-        this.permissionList = roleNames;
-
+        this.menuList = menuList;
+        this.permissionList = permissionList;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> simpleGrantedAuthorities=new ArrayList<>();
-        for (SysPermission menu : permissionList) {
-            simpleGrantedAuthorities.add(new SimpleGrantedAuthority(menu.getPermission()));
+        for (SysPermission permission : permissionList) {
+            simpleGrantedAuthorities.add(new SimpleGrantedAuthority(permission.getPermission()));
         }
         return simpleGrantedAuthorities;
     }

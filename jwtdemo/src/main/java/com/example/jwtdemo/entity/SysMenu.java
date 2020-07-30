@@ -1,24 +1,24 @@
 package com.example.jwtdemo.entity;
 
 import lombok.Data;
-import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Date;
 
 /**
  * @Description
  * @Author li long
- * @Date 2020/7/30 11:08
+ * @Date 2020/7/30 15:05
  * @Version 1.0
  **/
 @Data
-public class SysPermission {
+public class SysMenu {
+
     private String id;
     private String parentId;
+    private String title;
     private String name;
-    private String type;
-    private String path;
-    private String permission;
     private Integer sort;
-    private Integer disable;
-
+    private String icon;
+    private Integer hidden;
 
 }

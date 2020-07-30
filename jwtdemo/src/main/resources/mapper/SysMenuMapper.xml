@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.jwtdemo.dao.SysMenuDao">
+    <select id="getListByRoleId" resultType="com.example.jwtdemo.entity.SysMenu" parameterType="string">
+      select
+      m.id,
+      m.parent_id,
+      m.title,
+      m.name,
+      m.sort,
+      m.icon,
+      m.hidden
+      from
+      sys_role_menu rm
+      left join
+      sys_menu m
+      on rm.menu_id=m.id
+      where rm.role_id=#{roleId}
+
+
+    </select>
+</mapper>

@@ -12,5 +12,6 @@
         left join  sys_role r
         on  r.id=su.role_id
         where sr.user_id=#{userId}
+
     </select>
 </mapper>

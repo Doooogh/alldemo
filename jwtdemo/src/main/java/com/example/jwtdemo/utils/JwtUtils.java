@@ -96,7 +96,12 @@ public class JwtUtils {
      */
     public boolean validateToken(String token, UserDetails userDetails) {
         String username = getUserNameFromToken(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        if( username.equals(userDetails.getUsername()) && !isTokenExpired(token)){
+            //更新token过期时间  防止在请求的时候赶上token正好过期   用户体验不好
+            refreshHeadToken(token);
+            return true;
+        }
+        return false;
     }
 
     /**

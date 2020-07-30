@@ -16,5 +16,10 @@ public class SysRole {
     private String id;
     private String roleName;
     private String roleEnglishName;
-    private Set<String> menuList;
+    private Integer userNum;
+    private Integer disable;
+    private String description;
+    private Integer sort;
+    private Set<SysMenu> menuList;
+    private Set<SysPermission> permissionList;
 }

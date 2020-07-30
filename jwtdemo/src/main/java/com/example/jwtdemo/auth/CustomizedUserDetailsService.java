@@ -1,8 +1,12 @@
 package com.example.jwtdemo.auth;
 
+import com.example.jwtdemo.dao.SysMenuDao;
 import com.example.jwtdemo.dao.SysPermissionDao;
+import com.example.jwtdemo.dao.SysRoleDao;
 import com.example.jwtdemo.dao.SysUserDao;
+import com.example.jwtdemo.entity.SysMenu;
 import com.example.jwtdemo.entity.SysPermission;
+import com.example.jwtdemo.entity.SysRole;
 import com.example.jwtdemo.entity.SysUser;
 import com.example.jwtdemo.service.SysMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +15,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -29,8 +35,12 @@ public class CustomizedUserDetailsService implements UserDetailsService {
     @Autowired
     private SysPermissionDao sysPermissionDao;
 
+
     @Autowired
-    private SysMenuService sysMenuService;
+    private SysRoleDao sysRoleDao;
+
+    @Autowired
+    private SysMenuDao sysMenuDao;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -42,10 +52,19 @@ public class CustomizedUserDetailsService implements UserDetailsService {
             return jwtUser;
         }
 
-        Set<SysPermission> permissionList=new HashSet<>();
-        //TODO 将该用户的权限查询出来  赋值给permissionList
-
-        jwtUser=new JwtUser(sysUser,permissionList);
+        //TODO 将该用户的菜单和权限查询出来
+        List<SysMenu> menuList=new ArrayList<>();
+        List<SysPermission> permissionList=new ArrayList<>();
+        List<SysRole> roleList = sysRoleDao.getRoleByUserId(sysUser.getId());
+        for (SysRole sysRole : roleList) {
+            List<SysMenu> menuListTem = sysMenuDao.getListByRoleId(sysRole.getId());
+            List<SysPermission> permissionListTem = sysPermissionDao.getListByRoleId(sysRole.getId());
+            menuList.addAll(menuListTem);
+            permissionList.addAll(permissionListTem);
+        }
+        Set<SysMenu> menuSet=new HashSet<>(menuList);
+        Set<SysPermission> permissionSet=new HashSet<>(permissionList);
+        jwtUser=new JwtUser(sysUser,menuSet,permissionSet);
         return jwtUser;
     }
 }
