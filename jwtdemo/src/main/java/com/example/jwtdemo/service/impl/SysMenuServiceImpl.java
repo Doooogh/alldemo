@@ -2,6 +2,8 @@ package com.example.jwtdemo.service.impl;
 
 import com.example.jwtdemo.dao.SysPermissionDao;
 import com.example.jwtdemo.dao.SysRoleDao;
+import com.example.jwtdemo.dao.SysRoleMenuDao;
+import com.example.jwtdemo.dao.SysRolePermissionDao;
 import com.example.jwtdemo.entity.SysPermission;
 import com.example.jwtdemo.entity.SysRole;
 import com.example.jwtdemo.service.SysMenuService;
@@ -26,13 +28,21 @@ public class SysMenuServiceImpl implements SysMenuService {
     @Autowired
     private SysRoleDao roleDao;
 
+    @Autowired
+    private SysRoleMenuDao sysRoleMenuDao;
+
+
+
     @Override
     public List<SysPermission> getMenuByUserId(String userId) {
         List<SysPermission> menuList=new ArrayList<>();
         List<SysRole> roleList = roleDao.getRoleByUserId(userId);
         for (SysRole sysRole : roleList) {
-            List<SysPermission> listByRoleId = menuDao.getListByRoleId(sysRole.getId());
-            menuList.addAll(listByRoleId);
+            List<String> menuIdsByRoleId = sysRoleMenuDao.getMenuIdsByRoleId(sysRole.getId());
+            if(menuIdsByRoleId.size()>0){
+                List<SysPermission> listByRoleId = menuDao.getListByIds(menuIdsByRoleId);
+                menuList.addAll(listByRoleId);
+            }
         }
         return menuList;
     }

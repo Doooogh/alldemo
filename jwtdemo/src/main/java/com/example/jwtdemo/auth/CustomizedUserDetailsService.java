@@ -1,9 +1,6 @@
 package com.example.jwtdemo.auth;
 
-import com.example.jwtdemo.dao.SysMenuDao;
-import com.example.jwtdemo.dao.SysPermissionDao;
-import com.example.jwtdemo.dao.SysRoleDao;
-import com.example.jwtdemo.dao.SysUserDao;
+import com.example.jwtdemo.dao.*;
 import com.example.jwtdemo.entity.SysMenu;
 import com.example.jwtdemo.entity.SysPermission;
 import com.example.jwtdemo.entity.SysRole;
@@ -45,6 +42,12 @@ public class CustomizedUserDetailsService implements UserDetailsService {
     @Autowired
     private SysMenuDao sysMenuDao;
 
+    @Autowired
+    private SysRoleMenuDao sysRoleMenuDao;
+
+    @Autowired
+    private SysRolePermissionDao sysRolePermissionDao;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         JwtUser jwtUser=null;
@@ -60,11 +63,18 @@ public class CustomizedUserDetailsService implements UserDetailsService {
         List<SysPermission> permissionList=new ArrayList<>();
         List<SysRole> roleList = sysRoleDao.getRoleByUserId(sysUser.getId());
         List<String> roleIds = roleList.stream().map(SysRole::getId).collect(toList());
-        for (SysRole sysRole : roleList) {
-            List<SysMenu> menuListTem = sysMenuDao.getListByRoleId(sysRole.getId());
-            List<SysPermission> permissionListTem = sysPermissionDao.getListByRoleId(sysRole.getId());
-            menuList.addAll(menuListTem);
-            permissionList.addAll(permissionListTem);
+        for (String roleId : roleIds) {
+            List<String> menuIdsByRoleId = sysRoleMenuDao.getMenuIdsByRoleId(roleId);
+            List<String> permissionIdsByRoleId = sysRolePermissionDao.getPermissionIdsByRoleId(roleId);
+            if(menuIdsByRoleId.size()>0){
+                List<SysMenu> menuListTem = sysMenuDao.getListByIds(menuIdsByRoleId);
+                menuList.addAll(menuListTem);
+            }
+            if(permissionIdsByRoleId.size()>0){
+                List<SysPermission> permissionListTem = sysPermissionDao.getListByIds(permissionIdsByRoleId);
+
+                permissionList.addAll(permissionListTem);
+            }
         }
         Set<SysMenu> menuSet=new HashSet<>(menuList);
         Set<SysPermission> permissionSet=new HashSet<>(permissionList);

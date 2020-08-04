@@ -39,7 +39,7 @@ public class LoginController {
         tokenMap.put("tokenHead", tokenHead);
         return CommonResult.success(tokenMap);
     }
-    @PreAuthorize("hasAnyRole('USER')")
+
     @PostMapping(value = "/testNeed")
     public String testNeed() {
         return "testNeed";
