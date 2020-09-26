@@ -1,0 +1,39 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: ierp-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true #使用小写service-id
+      routes: #配置路由路径
+        - id: ierp-auth
+          uri: lb://ierp-auth
+          predicates:
+            - Path=/ierp-auth/**
+          filters:
+            - StripPrefix=1
+
+        - id: ierp-system
+          uri: lb://ierp-system
+          predicates:
+            - Path=/ierp-system/**
+          filters:
+            - StripPrefix=1
+
+
+
+
+
+
+management: #开启SpringBoot Admin的监控
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

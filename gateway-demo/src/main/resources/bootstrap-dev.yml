@@ -1,0 +1,39 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://git.easyhao.com:8848
+        namespace: 300c3513-5724-4e0f-9c92-7ab6cfe00d2f
+        group: IERP-DEV-GROUP
+      config:
+        server-addr: http://git.easyhao.com:8848
+        namespace: 300c3513-5724-4e0f-9c92-7ab6cfe00d2f
+        group: IERP-DEV-GROUP
+        file-extension: yaml
+
+
+  redis:
+    database: 0
+    port: 6379
+    host: localhost
+    password:
+
+
+
+secure:
+  ignore:
+    urls: #配置白名单路径
+      - "/doc.html"
+      - "/swagger-resources/**"
+      - "/swagger/**"
+      - "/**/v2/api-docs"
+      - "/**/*.js"
+      - "/**/*.css"
+      - "/**/*.png"
+      - "/**/*.ico"
+      - "/webjars/springfox-swagger-ui/**"
+      - "/actuator/**"
+      - "/ierp-auth/oauth/token"
+      - "/ierp-auth/rsa/publicKey"
+      - "/ierp-system/system/login"
+      - "/ierp-system/system/register"
