@@ -16,16 +16,17 @@
         sys_permission p
     </select>
 
-
-    <select id="getListByIds" resultType="com.example.jwtdemo.entity.SysPermission">
-        select *
+    <select id="getListByIds" resultType="com.example.jwtdemo.entity.SysPermission" parameterType="string">
+        select
+        *
         from
-        sys_permission
-        where
-        id in
-        <foreach collection="ids" item="id" open="(" separator="," close=")">
+        sys_menu m
+        where m.id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
+
+
     </select>
 
     <select id="getListByRoleId" resultType="com.example.jwtdemo.entity.SysPermission" >
@@ -36,5 +37,6 @@
         id in
         (select id from sys_role_permission where role_id=#{roleId})
     </select>
+
 
 </mapper>

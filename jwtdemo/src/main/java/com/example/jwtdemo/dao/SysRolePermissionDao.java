@@ -8,12 +8,9 @@ import java.util.List;
 /**
  * @Description
  * @Author li long
- * @Date 2020/7/30 16:49
+ * @Date 2020/8/4 9:27
  * @Version 1.0
  **/
-public interface SysMenuDao {
-
-    List<SysMenu> getList();
-
-    List<SysMenu> getListByIds(@Param("ids") List<String> ids);
+public interface SysRolePermissionDao {
+    List<String> getPermissionIdsByRoleId(@Param("roleId") String roleId);
 }
