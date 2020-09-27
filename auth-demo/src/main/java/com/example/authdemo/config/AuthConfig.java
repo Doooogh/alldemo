@@ -1,8 +1,10 @@
 package com.example.authdemo.config;
 
+import com.example.authdemo.service.CusUserServiceDetailImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -10,11 +12,14 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+
+import javax.sql.DataSource;
 
 /**
  * @Description
@@ -33,12 +38,22 @@ public class AuthConfig extends AuthorizationServerConfigurerAdapter {
     private ClientDetailsService clientDetailsService;
 
 
-
     @Autowired
     private AuthorizationCodeServices authorizationCodeServices;
 
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private CusUserServiceDetailImpl cusUserServiceDetail;
+
+    @Autowired
+    private DataSource dataSource;
 
 
 
@@ -46,32 +61,61 @@ public class AuthConfig extends AuthorizationServerConfigurerAdapter {
     //客户端详情配置
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory()
+  /*      clients.inMemory()
                 .withClient("test")
                 .secret(passwordEncoder.encode("test"))
                 .scopes("all")
-                .authorizedGrantTypes("authorization_code","password","client_credentials","implicit","refresh_token")
+                .authorizedGrantTypes("authorization_code", "password", "client_credentials", "implicit", "refresh_token")
                 .autoApprove(false)  //false 跳转到授权页面
                 .redirectUris("http://www.baidu.com");
+*/
+
+        //配置客户端存储到db
+        JdbcClientDetailsService clientDetailsService = new JdbcClientDetailsService(dataSource);
+        clientDetailsService.setPasswordEncoder(passwordEncoder);
+        clients.withClientDetails(clientDetailsService);
+    }
+
+    //配置令牌的访问端点和令牌服务(tokenService)
+    @Override
+    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+      /*  endpoints
+//                .authenticationManager(authenticationManager)  //认证管理
+                .authorizationCodeServices(authorizationCodeServices)  //授权码服务
+                .tokenServices(tokenService())   //令牌管理
+                .tokenStore(tokenStore); //token管理*/
+
+        endpoints
+                .userDetailsService(cusUserServiceDetail)
+                .authenticationManager(authenticationManager)
+                .tokenServices(tokenService())   //令牌管理
+                .tokenStore(tokenStore); //token管理
+
     }
 
 
 
+    //配置端点安全约束
+    @Override
+    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
 
+        security
+                .tokenKeyAccess("permitAll()")
+                .checkTokenAccess("permitAll()")
+                .allowFormAuthenticationForClients();
+    }
 
 
     //设置授权码模式   暂时采用内存形式
     @Bean
-    public AuthorizationCodeServices authorizationCodeServices(){
+    public AuthorizationCodeServices authorizationCodeServices() {
         return new InMemoryAuthorizationCodeServices();
     }
 
 
-
-
     //令牌管理服务
     @Bean
-    public AuthorizationServerTokenServices tokenService(){
+    public AuthorizationServerTokenServices tokenService() {
         DefaultTokenServices tokenServices = new DefaultTokenServices();
         tokenServices.setClientDetailsService(clientDetailsService);  //基于内存
         //配置token存储
@@ -86,26 +130,6 @@ public class AuthConfig extends AuthorizationServerConfigurerAdapter {
         tokenServices.setRefreshTokenValiditySeconds(7 * 24 * 60 * 60);
         return tokenServices;
 
-    }
-
-    //配置令牌的访问端点和令牌服务(tokenService)
-    @Override
-    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints
-//                .authenticationManager(authenticationManager)  //认证管理
-                .authorizationCodeServices(authorizationCodeServices)  //授权码服务
-                .tokenServices(tokenService())   //令牌管理
-                .tokenStore(tokenStore); //token管理
-    }
-
-    //配置端点安全约束
-    @Override
-    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-
-        security
-                .tokenKeyAccess("permitAll()")
-                .checkTokenAccess("permitAll()")
-                .allowFormAuthenticationForClients();
     }
 
 
