@@ -1,6 +1,6 @@
-package com.example.authdemo.config;
+package com.example.authorizationcodedemo.config;
 
-import com.example.authdemo.service.CusUserServiceDetailImpl;
+import com.example.authorizationcodedemo.service.CusUserServiceDetailImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +14,6 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
-import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -30,7 +29,6 @@ import javax.sql.DataSource;
 @Configuration
 @EnableAuthorizationServer
 public class AuthConfig extends AuthorizationServerConfigurerAdapter {
-
     @Autowired
     private TokenStore tokenStore;
 
@@ -38,22 +36,25 @@ public class AuthConfig extends AuthorizationServerConfigurerAdapter {
     private ClientDetailsService clientDetailsService;
 
 
-    @Autowired
-    private AuthorizationCodeServices authorizationCodeServices;
-
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private CusUserServiceDetailImpl cusUserServiceDetail;
+    private DataSource dataSource;
 
     @Autowired
-    private DataSource dataSource;
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private CusUserServiceDetailImpl cusUserServiceDetail;
+
+
+
+    @Autowired
+    private AuthorizationCodeServices authorizationCodeServices;
+
+
 
 
 
@@ -61,14 +62,6 @@ public class AuthConfig extends AuthorizationServerConfigurerAdapter {
     //客户端详情配置
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-  /*      clients.inMemory()
-                .withClient("test")
-                .secret(passwordEncoder.encode("test"))
-                .scopes("all")
-                .authorizedGrantTypes("authorization_code", "password", "client_credentials", "implicit", "refresh_token")
-                .autoApprove(false)  //false 跳转到授权页面
-                .redirectUris("http://www.baidu.com");
-*/
 
         //配置客户端存储到db
         JdbcClientDetailsService clientDetailsService = new JdbcClientDetailsService(dataSource);
@@ -79,17 +72,12 @@ public class AuthConfig extends AuthorizationServerConfigurerAdapter {
     //配置令牌的访问端点和令牌服务(tokenService)
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-      /*  endpoints
-//                .authenticationManager(authenticationManager)  //认证管理
-                .authorizationCodeServices(authorizationCodeServices)  //授权码服务
-                .tokenServices(tokenService())   //令牌管理
-                .tokenStore(tokenStore); //token管理*/
-
         endpoints
+                .authorizationCodeServices(authorizationCodeServices)  //授权码服务
                 .userDetailsService(cusUserServiceDetail)
                 .authenticationManager(authenticationManager)
-                .tokenServices(tokenService())   //令牌管理
-                .tokenStore(tokenStore); //token管理
+                .tokenServices(tokenService());   //令牌管理
+
 
     }
 
@@ -106,11 +94,6 @@ public class AuthConfig extends AuthorizationServerConfigurerAdapter {
     }
 
 
-    //设置授权码模式   暂时采用内存形式
-    @Bean
-    public AuthorizationCodeServices authorizationCodeServices() {
-        return new InMemoryAuthorizationCodeServices();
-    }
 
 
     //令牌管理服务
@@ -131,8 +114,6 @@ public class AuthConfig extends AuthorizationServerConfigurerAdapter {
         return tokenServices;
 
     }
-
-
 
 
 

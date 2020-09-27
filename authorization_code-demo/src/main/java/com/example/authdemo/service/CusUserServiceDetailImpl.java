@@ -5,7 +5,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
 
 /**
  * @Description
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Service;
  * @Date 2020/9/27 16:58
  * @Version 1.0
  **/
-@Service
+//@Service
 public class CusUserServiceDetailImpl implements UserDetailsService {
 
     @Override
